@@ -70,4 +70,55 @@ ERROR: Could not build wheels for pysha3, which is required to install pyproject
 
 查看 **账户地址** 和 **private key**
 
+### 了解区块链
+
+#### 概念
+
+**网络**
+**钱包**
+
 ## 开发 Develop
+
+### 程序入口
+
+demo.py，死循环执行操作指令，直到收到`exit`指令
+
+```python
+if __name__ == "__main__":
+    while True:
+        result = False
+        cmd = input('请输入指令, 帮助"help"，退出"exit" >>> ').strip()
+        if cmd == 'help' or cmd == "-h":
+            print(hi.HelpInfo.print())
+        else:
+            result = operate(cmd)
+        
+        if result: 
+            print(op.exit())
+            confirm = input("是否确定退出(Y/N) >>> ").lower()
+            if confirm == 'y' or confirm == 'yes' :
+                break
+```
+
+### 操作路由
+
+通过操作指令判断执行方法：
+
+- help: 指引，提示操作指令
+- exit: 退出脚本
+- -1：  查询余额，提供账户地址可以查询其他账户余额
+- -2:   生成签名
+- ... 待完善
+
+### Sdk接入
+
+#### 账户相关操作
+
+账户相关操作：`operate/op_account.py`
+
+**查询余额** : `sdk.zksync.get_balance`
+
+... TODO ...
+#### 交易相关操作
+
+... TODO ...
