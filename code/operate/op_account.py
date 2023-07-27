@@ -3,6 +3,12 @@ import zk_account as zk_acc
 
 from zksync2.core.types import EthBlockParams
 from zksync2.signer.eth_signer import PrivateKeyEthSigner
+from zksync2.core.types import ZkBlockParams
+from zksync2.transaction.transaction_builders import TxFunctionCall
+from eth_typing import HexStr, HexAddress
+from eth_account.signers.local import LocalAccount
+from eth_utils import to_checksum_address
+from web3 import Web3
 
 ## 查询余额操作
 op.register('-1', '查询余额， 参数1: 账户地址（默认自身）')
@@ -13,22 +19,69 @@ def check_balance(acc=zk_acc.my_account.address):
     参数：账户地址（默认自己地址）
     '''
     sdk = zk_acc.sdk
-    acc = input('请输入账户地址，默认当前账户')
+    acc = input('请输入账户地址，默认当前账户>>>')
     acc = acc or zk_acc.my_account.address
-    try:
-        zk_balance = sdk.zksync.get_balance(acc, EthBlockParams.LATEST.value)
-        print(f"Balance: {zk_balance}")
-    except Exception as e:
-        print('调用失败', e)
+    zk_balance = sdk.zksync.get_balance(acc, EthBlockParams.LATEST.value)
+    print(f"Balance: {zk_balance}")
 
-## 生成签名
-op.register('-2', '生成签名')
+## 转账ETH
+op.register('-2', '转账ETH 参数1: 地址, 参数2: 数量')
 @op.register('-2')
-def generate_sign():
-    chain_id = zk_acc.sdk.zksync.chain_id
-    try:
-        signer = PrivateKeyEthSigner(zk_acc.my_account, chain_id)
-        # _sign = signer.sign_typed_data()
-        print(signer)
-    except Exception as e:
-        print('调用失败', e)
+def transfer_eth(
+    address: HexAddress,
+    amount: float
+) -> bytes:
+    sdk: Web3 = zk_acc.sdk
+    account: LocalAccount = zk_acc.my_account
+    # 获取链路 ID
+    chain_id = sdk.zksync.chain_id
+
+    # 生成签名工具
+    signer = PrivateKeyEthSigner(account, chain_id)
+
+    # Get nonce of ETH address on zkSync network
+    nonce = sdk.zksync.get_transaction_count(
+        account.address, ZkBlockParams.COMMITTED.value
+    )
+
+    # 交易费用 单价
+    gas_price = sdk.zksync.gas_price
+
+    # 转账调用参数
+    tx_func_call = TxFunctionCall(
+        chain_id=chain_id,
+        nonce=nonce,
+        from_=account.address,
+        to=to_checksum_address(address),
+        value=sdk.to_wei(amount, "ether"),
+        data=HexStr("0x"),
+        gas_limit=0,  # UNKNOWN AT THIS STATE
+        gas_price=gas_price,
+        max_priority_fee_per_gas=100_000_000,
+    )
+
+    # 交易费用预估
+    estimate_gas = sdk.zksync.eth_estimate_gas(tx_func_call.tx)
+    print(f"Fee for transaction is: {estimate_gas * gas_price}")
+
+    # 使用 EIP-712 格式
+    tx_712 = tx_func_call.tx712(estimate_gas)
+
+    # 生成签名信息
+    signed_message = signer.sign_typed_data(tx_712.to_eip712_struct())
+
+    # 加密签名信息
+    msg = tx_712.encode(signed_message)
+
+    # 发送ETH
+    tx_hash = sdk.zksync.send_raw_transaction(msg)
+    print(f"发起转账成功, 交易 hash : {tx_hash.hex()}")
+
+    # 等待返回
+    tx_receipt = sdk.zksync.wait_for_transaction_receipt(
+        tx_hash, timeout=240, poll_latency=0.5
+    )
+    print(f"交易状态: {tx_receipt['status']}")
+
+    # Return the transaction hash of the transfer
+    return tx_hash

@@ -10,7 +10,12 @@ from zksync2.module.module_builder import ZkSyncBuilder
 my_key = pk.account.key
 my_account = Account.from_key(my_key)
 
-zk_url = 'https://testnet.era.zksync.dev'
+# zk_url = 'https://testnet.era.zksync.dev' # 测试网络
+
+## 测试网络
+zk_dev_url = 'https://zksync-era-testnet.blockpi.network/v1/rpc/public'
+goerli_url = 'https://goerli.infura.io/v3/'
+
 
 ## 加载sdk
-sdk = ZkSyncBuilder.build(zk_url)
+sdk = ZkSyncBuilder.build(zk_dev_url)

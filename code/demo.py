@@ -1,4 +1,5 @@
 import zk_account as acc
+import utils.utils_chain as uc
 import help_info as hi
 import operate as op
 from operate import op_account as op_acc
@@ -11,7 +12,11 @@ def operate(cmd) -> bool:
     if cmd == '-1' :
         op_acc.check_balance()
     elif cmd == '-2':
-        op_acc.generate_sign()
+        target_addr = input('请输入要转账的地址>>>')
+        amount = float(input('请输入数量>>>'))
+        op_acc.transfer_eth(target_addr, amount)
+    elif cmd == '-3':
+        print(uc.get_chain('goerli'))
     elif cmd == 'exit' or cmd == '-e' :
         return True
 
@@ -22,7 +27,10 @@ if __name__ == "__main__":
         if cmd == 'help' or cmd == "-h":
             print(hi.HelpInfo.print())
         else:
-            result = operate(cmd)
+            try:
+                result = operate(cmd)
+            except Exception as e:
+                print('调用失败: ', e)
         
         if result: 
             print(op.exit())
