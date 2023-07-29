@@ -16,7 +16,11 @@ def operate(cmd) -> bool:
         amount = float(input('请输入数量>>>'))
         op_acc.transfer_eth(target_addr, amount)
     elif cmd == '-3':
-        print(uc.get_chain('goerli'))
+        amount = float(input('请输入数量>>>'))
+        print(op_acc.deposit(amount))
+    elif cmd == '-4':
+        amount = float(input('请输入数量>>>'))
+        print(op_acc.withdraw(amount))
     elif cmd == 'exit' or cmd == '-e' :
         return True
 

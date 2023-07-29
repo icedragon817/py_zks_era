@@ -19,3 +19,6 @@ goerli_url = 'https://goerli.infura.io/v3/'
 
 ## 加载sdk
 sdk = ZkSyncBuilder.build(zk_dev_url)
+
+# from web3 import Web3
+# sdk = Web3(Web3.HTTPProvider(zk_dev_url))

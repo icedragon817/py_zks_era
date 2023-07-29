@@ -97,6 +97,37 @@ ERROR: Could not build wheels for pysha3, which is required to install pyproject
 
 ## 开发 Develop
 
+### 了解 Web3
+
+
+Web3对象用于与区块链交互的对象。创建方式：
+```python
+from web3 import Web3
+
+## rpc地址可以在链路信息中获取到
+rpc = 'https://rpc.ankr.com/eth_goerli'
+w3 = Web3(Web3.HTTPProvider(rpc))
+```
+
+`zksyc2`是`era`网络封装的sdk，把Web3对象进行了一定的封装，添加了模块`zksync`，使用方式用提供方式创建：
+```python
+from zksync2.module.module_builder import ZkSyncBuilder
+
+sdk = ZkSyncBuilder.build(zk_dev_url)
+```
+
+`zksync`模块提供的功能可以去`from zksync2.module.zksync_module import ZkSync`模块中去查看。
+
+`ZkSync`是一个继承`Eth`的类。
+
+`Eth`类位于`web3.eth`包，具体属性和方法：
+- `chain_id`: 链路ID
+- `get_balance()`: 查看余额
+- ...
+
+
+#### 链路供应商（Providers）
+
 ### 程序入口
 
 demo.py，死循环执行操作指令，直到收到`exit`指令
