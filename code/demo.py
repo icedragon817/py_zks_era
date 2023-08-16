@@ -21,6 +21,9 @@ def operate(cmd) -> bool:
     elif cmd == '-4':
         amount = float(input('请输入数量>>>'))
         print(op_acc.withdraw(amount))
+    elif cmd == '0':
+        bridge_addresses = acc.sdk.zksync.zks_get_bridge_contracts()
+        print(bridge_addresses)
     elif cmd == 'exit' or cmd == '-e' :
         return True
 

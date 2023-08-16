@@ -116,10 +116,11 @@ def deposit(amount, chain:str ='goerli') -> tuple[HexStr, HexStr]:
         raise RuntimeError("Deposit transaction on L1 network failed")
 
     # 在 L1 网络上获取 ZkSync 合约
-    zksync_contract = ZkSyncContract(sdk.zksync.main_contract_address, eth_web3, account)
+    # zksync_contract = ZkSyncContract(sdk.zksync.main_contract_address, eth_web3, account)
 
     # 获取 L2 网络上存款交易的哈希值
-    l2_hash = sdk.zksync.get_l2_hash_from_priority_op(l1_tx_receipt, zksync_contract)
+    # l2_hash = sdk.zksync.get_l2_hash_from_priority_op(l1_tx_receipt, zksync_contract)
+    l2_hash = sdk.zksync.get_l2_hash_from_priority_op(l1_tx_receipt, eth_provider.main_contract)
 
     # 等待L2网络充值交易完成（5-7分钟）
     print("Waiting for deposit transaction on L2 network to be finalized (5-7 minutes)")
