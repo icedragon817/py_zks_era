@@ -4,7 +4,7 @@ class HelpInfo():
     ## 打印help info
     @classmethod
     def print(cls) -> str:
-        info = '\n'
+        info = '\n===>> 数字指令为基础操作，其他为高阶操作 <<=== \n'
         for k, v in cls._info.items():
             info += '\t' + k + ' : ' + v + '\n'
         return info

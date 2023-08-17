@@ -26,3 +26,36 @@ def exit():
     
     info += op_info
     return info
+
+from operate import op_account as op_acc, op_plus
+### 各类基础操作 通过传递的参数区分
+## 数字指令为基础操作
+def base_operate(cmd, account, *params) -> bool:
+    if not cmd:
+        return
+    print(f'recive cmd: {cmd}')
+    if cmd == '-1' :
+        op_acc.check_balance(account)
+    elif cmd == '-2':
+        target_addr, amount = params[0], params[1]
+        op_acc.transfer_eth(account, target_addr, amount)
+    elif cmd == '-3':
+        amount = params[0]
+        print(op_acc.deposit(amount))
+    elif cmd == '-4':
+        amount = params[0]
+        print(op_acc.withdraw(amount))
+    elif cmd == '0':
+        # bridge_addresses = acc.sdk.zksync.zks_get_bridge_contracts()
+        # print(bridge_addresses)
+        pass
+
+### 各类高级操作 通过传递的参数区分
+## 数字指令为基础操作
+def senior_operate(cmd, *params) -> bool:
+    if cmd == '-com' :
+        op_plus.combine(params[0], params[1])
+    elif cmd == '-batch':
+        op_plus.batch(params[0], params[1])
+    else:
+        pass

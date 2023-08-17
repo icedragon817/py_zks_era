@@ -20,26 +20,24 @@ from web3.middleware import geth_poa_middleware
 ## 查询余额操作
 op.register('-1', '查询余额， 参数1: 账户地址（默认自身）')
 @op.register('-1')
-def check_balance(acc=zk_acc.my_account.address):
+def check_balance(acc: LocalAccount):
     '''
     查询余额
     参数：账户地址（默认自己地址）
     '''
     sdk = zk_acc.sdk
-    acc = input('请输入账户地址，默认当前账户>>>')
-    acc = acc or zk_acc.my_account.address
-    zk_balance = sdk.zksync.get_balance(acc, EthBlockParams.LATEST.value)
-    print(f"Balance: {zk_balance}")
+    zk_balance = sdk.zksync.get_balance(acc.address, EthBlockParams.LATEST.value)
+    print(f"Accout: {acc.address}, Balance: {zk_balance}")
 
 ## 转账ETH
 op.register('-2', '转账ETH 参数1: 地址, 参数2: 数量')
 @op.register('-2')
 def transfer_eth(
+    account: LocalAccount,
     address: HexAddress,
     amount: float
 ) -> bytes:
     sdk: Web3 = zk_acc.sdk
-    account: LocalAccount = zk_acc.my_account
     # 获取链路 ID
     chain_id = sdk.zksync.chain_id
 
@@ -96,11 +94,12 @@ def transfer_eth(
 ## 其他链充币到era链 L1 -> L2
 op.register('-3', 'eth充币 L1 -> L2 参数1: L1网络, 参数2: 数量')
 @op.register('-3')
-def deposit(amount, chain:str ='goerli') -> tuple[HexStr, HexStr]:
+def deposit(
+    account: LocalAccount,
+    amount, chain:str ='goerli') -> tuple[HexStr, HexStr]:
     
     ## 获取目标链provider
     sdk: Web3 = zk_acc.sdk
-    account = zk_acc.my_account
     chain_rpc = uc.get_chain(chain)
     eth_web3 = Web3(Web3.HTTPProvider(chain_rpc))
     eth_provider = EthereumProvider(sdk, eth_web3, account)
@@ -134,11 +133,12 @@ def deposit(amount, chain:str ='goerli') -> tuple[HexStr, HexStr]:
 ## era链提币到其他链 L2 -> L1
 op.register('-4', 'eth提币 L1 -> L2 参数1: L1网络, 参数2: 数量')
 @op.register('-4')
-def withdraw(amount, chain:str ='goerli') -> tuple[HexStr, HexStr]:
+def withdraw(
+    account: LocalAccount,
+    amount, chain:str ='goerli') -> tuple[HexStr, HexStr]:
     
     ## 获取目标链provider
     sdk: Web3 = zk_acc.sdk
-    account = zk_acc.my_account
     chain_rpc = uc.get_chain(chain)
     eth_web3 = Web3(Web3.HTTPProvider(chain_rpc))
     eth_web3.middleware_onion.inject(geth_poa_middleware, layer=0)
