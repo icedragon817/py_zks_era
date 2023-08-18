@@ -27,7 +27,9 @@ def check_balance(acc: LocalAccount):
     '''
     sdk = zk_acc.sdk
     zk_balance = sdk.zksync.get_balance(acc.address, EthBlockParams.LATEST.value)
-    print(f"Accout: {acc.address}, Balance: {zk_balance}")
+    res = f"Accout: {acc.address}, Balance: {zk_balance}"
+    print(res)
+    return res
 
 ## 转账ETH
 op.register('-2', '转账ETH 参数1: 地址, 参数2: 数量')
@@ -86,10 +88,9 @@ def transfer_eth(
     tx_receipt = sdk.zksync.wait_for_transaction_receipt(
         tx_hash, timeout=240, poll_latency=0.5
     )
-    print(f"交易状态: {tx_receipt['status']}")
-
+    res = f"发起转账成功, 交易 hash : {tx_hash.hex()}, 交易状态: {tx_receipt['status']}"
     # Return the transaction hash of the transfer
-    return tx_hash
+    return res
 
 ## 其他链充币到era链 L1 -> L2
 op.register('-3', 'eth充币 L1 -> L2 参数1: L1网络, 参数2: 数量')
@@ -128,7 +129,9 @@ def deposit(
                                                                         poll_latency=10)
 
     # 从 L1 和 L2 网络返回存款交易哈希
-    return l1_tx_receipt['transactionHash'].hex(), l2_tx_receipt['transactionHash'].hex()
+    l1_hash, l2_hash = l1_tx_receipt['transactionHash'].hex(), l2_tx_receipt['transactionHash'].hex()
+    res = f'交易成功，L1交易hash：{l1_hash}， l2交易hash:{l2_hash}'
+    return res
 
 ## era链提币到其他链 L2 -> L1
 op.register('-4', 'eth提币 L1 -> L2 参数1: L1网络, 参数2: 数量')
@@ -165,5 +168,6 @@ def withdraw(
     l1_tx_receipt = eth_provider.finalize_withdrawal(l2_tx_receipt["transactionHash"])
 
     # 从 L1 和 L2 网络返回存款交易哈希
-    return l1_tx_receipt['transactionHash'].hex(), l2_tx_receipt['transactionHash'].hex()
-
+    l1_hash, l2_hash = l1_tx_receipt['transactionHash'].hex(), l2_tx_receipt['transactionHash'].hex()
+    res = f'交易成功，L1交易hash：{l1_hash}， l2交易hash:{l2_hash}'
+    return res

@@ -1,5 +1,8 @@
 # zks era 撸毛脚本
 
+## 背景
+解放双手，通过脚本实现自动化操作。
+
 ## 使用方式
 ### 下载
 
@@ -7,8 +10,9 @@
 
 ### 配置环境
 * 打开powershell
+* 进入到项目根目录
 * 切换虚拟环境
-* 运行demo.py
+* 运行demo.py，使用命令：`python code\demo.py`
 ## 准备 Prepare
 ### python 安装
 版本：**3.10.11** [downlown](https://www.python.org/downloads/release/python-31011/)

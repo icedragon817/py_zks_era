@@ -1,7 +1,7 @@
 import zk_account as acc
-import utils.utils_chain as uc
 import help_info as hi
 import operate as op
+import config
 
 from eth_account import Account
 import logging
@@ -29,16 +29,16 @@ def operate(cmd) -> bool:
         ## 组合操作账户key，默认当前账户
         key = input('操作账户key，默认当前配置账户 >>>').strip()
         ## 操作文件路径
-        op_file = input('操作文件路径，默认相对路径code\csv\operate.csv >>>').strip()
-        op.senior_operate(cmd, key, op_file)
-        print('操作结束，具体日志记录在D：\\eth\operate.log')
+        op_file = input(f'操作文件路径，默认相对路径{config.op_file_path} >>>').strip()
+        log_path = op.senior_operate(cmd, key, op_file)
+        print(f'操作结束，具体日志记录在{log_path}')
     elif cmd == '-batch':
         ## 批量操作 key_file 文件路径
-        keys_file = input('账号列表路径，默认相对路径code\csv\keys.csv >>>').strip()
+        keys_file = input(f'账号列表路径，默认相对路径{config.keys_file_path} >>>').strip()
         ## 操作文件路径
-        op_file = input('操作文件路径，默认相对路径code\csv\operate.csv >>>').strip()
-        op.senior_operate(cmd, keys_file, op_file)
-        print('操作结束，具体日志记录在D：\\eth\operate.log')
+        op_file = input(f'操作文件路径，默认相对路径{config.op_file_path} >>>').strip()
+        log_path = op.senior_operate(cmd, keys_file, op_file)
+        print(f'操作结束，具体日志记录在{log_path}')
     elif cmd == 'exit' or cmd == '-e' :
         return True
     else: 
