@@ -7,6 +7,10 @@ class ChainInfo() :
         self.__rpc = rpc
 
     @property
+    def name(self):
+        return self.__name
+    
+    @property
     def rpc(self):
         return self.__rpc
 
@@ -26,6 +30,6 @@ def add_chain(name, rpc):
 def get_chain(name):
     return ChainInfo.get_rpc(name)
 
-print('utils_chain init .....')
+# print('utils_chain init .....')
 add_chain('zk_dev', 'https://zksync-era-testnet.blockpi.network/v1/rpc/public')
 add_chain('goerli', 'https://rpc.ankr.com/eth_goerli')

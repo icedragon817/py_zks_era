@@ -12,6 +12,13 @@ class MyThread(threading.Thread):
         except Exception as e:
             self.exception = e
 
+    @property
+    def info(self):
+        return self._info
+    
+    @info.setter
+    def info(self, info) :
+        self._info= info
 
 ## 线程池大小
 thread_pool_size = 100
@@ -35,6 +42,11 @@ def batch_execute(infos:list, func, *arg):
         if index * thread_pool_size > len(infos):
             break
     pass
+
+## 更新线程信息
+def update_thread_info(info):
+    current_thread: MyThread = threading.current_thread()
+    current_thread.info = info
 
 ## 同步操作
 def sync_operate():

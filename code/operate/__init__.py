@@ -61,5 +61,37 @@ def senior_operate(cmd, *params) -> bool:
         return op_plus.combine(params[0], params[1])
     elif cmd == '-batch':
         return op_plus.batch(params[0], params[1])
+    elif cmd == '-random':
+        return op_plus.op_random(params[0], params[1])
     else:
         pass
+
+## 指令对象
+class Op_cmd():
+    _args = ()
+
+    def __init__(self, *params) -> None:
+        self._cmd = params[0]
+        if len(params) > 1 :
+            self._args = params[1:]
+    
+    @property
+    def cmd(self):
+        return self._cmd
+    @property
+    def args(self) -> tuple:
+        return self._args
+
+## 根据指令构造指令对象
+def cmd_instance(cmd, **key) -> Op_cmd:
+    args = (cmd,)
+    if cmd == '-1':
+        pass
+    elif cmd == '-2':
+        args = (cmd, key.get('target_addr'), key.get('amount'))
+    elif cmd == '-3':
+        args = (cmd, key.get('amount'))
+    elif cmd == '-4':
+        args = (cmd, key.get('amount'))
+    
+    return Op_cmd(*args)

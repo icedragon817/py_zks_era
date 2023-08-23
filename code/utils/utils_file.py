@@ -64,3 +64,23 @@ def toCls(s: str, cls):
     if len(ls) == 0:
         return
     return cls(*ls)
+
+## 读配置文件
+def read_propertier(path) -> dict:
+    rs = {}
+    try:
+        with open(path, encoding='utf-8') as f:
+            while True:
+                content = f.readline()
+                if len(content) == 0:
+                    break
+                else:
+                    v = content.split('=')
+                    if len(v) == 2:
+                        rs[v[0].strip()] = v[1].strip()
+    except FileExistsError as e :
+        print(e)
+    except FileNotFoundError as e:
+        print(e)
+    
+    return rs

@@ -1,21 +1,4 @@
-def read_propertier(path) -> dict:
-    rs = {}
-    try:
-        with open(path, encoding='utf-8') as f:
-            while True:
-                content = f.readline()
-                if len(content) == 0:
-                    break
-                else:
-                    v = content.split('=')
-                    if len(v) == 2:
-                        rs[v[0].strip()] = v[1].strip()
-    except FileExistsError as e :
-        print(e)
-    except FileNotFoundError as e:
-        print(e)
-    
-    return rs
+import utils.utils_file as u_file
 
 class Account() :
     '''
@@ -33,5 +16,5 @@ class Account() :
     def key(self):
         return self.__key
 ## 读取配置文件信息
-prop = read_propertier(r'code\private_key\key.properties')
+prop = u_file.read_propertier(r'code\private_key\key.properties')
 account = Account(prop)
