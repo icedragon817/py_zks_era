@@ -102,7 +102,12 @@ ERROR: Could not build wheels for pysha3, which is required to install pyproject
 
 - **转账**: 在同一网络上将数字货币转移到另一个账户的交易行为。
 
-- **提币\充币**: 本质是两笔交易，先在A网络将个人账户的数字货币转账官方账户，再由B网络的官方账户转账到个人账户。
+- **提币\充币**: 本质上至少是两笔交易，先在A网络将个人账户的数字货币转账官方账户，再由B网络的官方账户转账到个人账户。
+
+- **Gas(燃料)**: 区块链上交易的燃料费用，由两部分组成：`Gas_limit`和`Gas_price`
+    - `Gas_limit`: 用户愿意为执行某个操作或确认交易支付的最大Gas量。当设置的最大Gas Limit用完时，交易还未完成，那么交易失败，并且已消耗的费用不再退回。
+    - `Gas_price`: 用户愿意花费于每个 Gas 单位的价钱。`Gas Price`越高，交易优先级越高，打包交易速度越快。
+    - 每一笔交易的费用为：`Gas_limit` * `Gas_price`，当账户余额不足，会直接报错`32000`
 
 
 ## 开发 Develop
@@ -320,7 +325,8 @@ if __name__ == "__main__":
 
 #### 账户相关操作
 
-<div id='test'>
+<div id='test' ></div>
+
 账户相关操作：`operate/op_account.py`
 
 **查询余额** : `sdk.zksync.get_balance`
@@ -329,3 +335,15 @@ if __name__ == "__main__":
 #### 交易相关操作
 
 ... TODO ...
+
+### 智能合约Dapp syncswap
+
+按照汇率转换不同的数字货币
+
+#### 合约
+##### 路由 Router
+##### 转换池工厂 PoolFactory
+#### 操作流程
+
+- 从工厂获取两种数字货币的转换池的合约地址
+- 通过Router进行转换(需要参数Pool合约地址)

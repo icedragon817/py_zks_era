@@ -1,6 +1,7 @@
 import operate as op
-import zk_account as zk_acc
+from zk_account import env
 import utils.utils_chain as uc
+import utils.utils_token as ut
 
 from zksync2.core.types import EthBlockParams
 from zksync2.signer.eth_signer import PrivateKeyEthSigner
@@ -20,14 +21,23 @@ from web3.middleware import geth_poa_middleware
 ## 查询余额操作
 op.register('-1', '查询余额， 参数1: 账户地址（默认自身）')
 @op.register('-1')
-def check_balance(acc: LocalAccount):
+def check_balance(address, chain=None):
     '''
     查询余额
     参数：账户地址（默认自己地址）
     '''
-    sdk = zk_acc.sdk
-    zk_balance = sdk.zksync.get_balance(acc.address, EthBlockParams.LATEST.value)
-    res = f"Accout: {acc.address}, Balance: {zk_balance}"
+    sdk = env.sdk
+    if chain is None or chain == '':
+        sdk = env.sdk
+        balance = sdk.zksync.get_balance(address, EthBlockParams.LATEST.value)
+    elif chain == 'eth':
+        sdk = env.eth_web3
+        balance = sdk.eth.get_balance(account=address)
+    else:
+        sdk = Web3(Web3.HTTPProvider(uc.get_chain(chain)))
+        balance = sdk.eth.get_balance(account=address)
+    
+    res = f"Accout: {address}, Balance: {balance}"
     print(res)
     return res
 
@@ -39,7 +49,7 @@ def transfer_eth(
     address: HexAddress,
     amount: float
 ) -> bytes:
-    sdk: Web3 = zk_acc.sdk
+    sdk: Web3 = env.sdk
     # 获取链路 ID
     chain_id = sdk.zksync.chain_id
 
@@ -97,18 +107,25 @@ op.register('-3', 'eth充币 L1 -> L2 参数1: L1网络, 参数2: 数量')
 @op.register('-3')
 def deposit(
     account: LocalAccount,
-    amount, chain:str ='goerli') -> tuple[HexStr, HexStr]:
+    amount, chain:str = None) -> tuple[HexStr, HexStr]:
     
     ## 获取目标链provider
-    sdk: Web3 = zk_acc.sdk
+    if chain is None:
+        chain = env.default_eth
+    sdk: Web3 = env.sdk
     chain_rpc = uc.get_chain(chain)
+    print(chain_rpc)
     eth_web3 = Web3(Web3.HTTPProvider(chain_rpc))
     eth_provider = EthereumProvider(sdk, eth_web3, account)
 
+    gas_price=eth_web3.eth.gas_price
     # L1网络的提款操作
-    print("Executing deposit transaction on L1 network")
+    eth_wei = Web3.to_wei(amount, 'ether')
+    print(f"Executing deposit transaction on {chain} network, {eth_wei} wei, {gas_price}")
     l1_tx_receipt = eth_provider.deposit(token=Token.create_eth(),
-                                         amount=Web3.to_wei(amount, 'ether'),
+                                         amount=eth_wei,
+                                         l2_gas_limit=ut.DefaultEthGasLimit.Default,
+                                         gas_limit=ut.DefaultEthGasLimit.Default,
                                          gas_price=eth_web3.eth.gas_price)
 
     # 判断状态
@@ -138,10 +155,10 @@ op.register('-4', 'eth提币 L1 -> L2 参数1: L1网络, 参数2: 数量')
 @op.register('-4')
 def withdraw(
     account: LocalAccount,
-    amount, chain:str ='goerli') -> tuple[HexStr, HexStr]:
+    amount, chain:str = env.default_eth) -> tuple[HexStr, HexStr]:
     
     ## 获取目标链provider
-    sdk: Web3 = zk_acc.sdk
+    sdk: Web3 = env.sdk
     chain_rpc = uc.get_chain(chain)
     eth_web3 = Web3(Web3.HTTPProvider(chain_rpc))
     eth_web3.middleware_onion.inject(geth_poa_middleware, layer=0)

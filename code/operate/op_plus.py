@@ -1,9 +1,8 @@
 ## 高阶操作
-
+from zk_account import env
 import operate as op
 from operate import op_task
 import config
-import zk_account as zk_acc
 import utils.utils_file as u_file
 import utils.utils_thread as u_thread
 from eth_account import Account
@@ -39,7 +38,7 @@ def combine(key, op_file, log_path=None, f_mode='w'):
     参数：key 操作账户，默认当前账户key
     参数：op_file 存储操作指令文件路径，操作指令即是 -1, -2等简单操作的指令集合
     '''
-    key = key or zk_acc.my_key
+    key = key or env.key
     op_file = op_file or config.op_file_path
     ## 获取账号对象
     account = Account.from_key(key)

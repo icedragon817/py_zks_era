@@ -33,3 +33,4 @@ def get_chain(name):
 # print('utils_chain init .....')
 add_chain('zk_dev', 'https://zksync-era-testnet.blockpi.network/v1/rpc/public')
 add_chain('goerli', 'https://rpc.ankr.com/eth_goerli')
+add_chain('eth', 'https://rpc.ankr.com/eth')

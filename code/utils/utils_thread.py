@@ -1,4 +1,5 @@
 import threading
+import traceback
 
 ## 同步锁
 lock = threading.Lock()
@@ -11,7 +12,13 @@ class MyThread(threading.Thread):
             super().run()
         except Exception as e:
             self.exception = e
+            print(traceback.format_exc())
 
+    def print_err(self):
+        if self.exception is not None:
+            print(traceback.format_exc())
+            # self.exception.with_traceback()
+        pass
     @property
     def info(self):
         return self._info
@@ -27,6 +34,7 @@ def batch_execute(infos:list, func, *arg):
     exceptions = []
     while True:
         t_list = []
+        ## 避免同时执行过多，按线程池大小分批执行
         for info in infos[thread_pool_size*index: thread_pool_size*(index+1)]:
             print(f'开始操作，key:{info}')
             args = (info, *arg)

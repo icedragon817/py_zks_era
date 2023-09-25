@@ -1,4 +1,18 @@
 from utils.utils_thread import sync_operate
+import json
+import importlib.resources as pkg_resources
+
+## 全部读取文件赋值到str
+def read_to_str(path) -> str:
+    # s = None
+    try:
+        with open(path, "r") as file:
+            s = file.read()
+    except FileExistsError as e :
+        print(e)
+    except FileNotFoundError as e:
+        print(e)
+    return s
 
 ## 读取csv转换成list
 def read_csv_to_arr(path, cls=None) -> list:
@@ -84,3 +98,12 @@ def read_propertier(path) -> dict:
         print(e)
     
     return rs
+
+## 读json文件
+def read_abi(src, file):
+    with pkg_resources.path(src, file) as p:
+        with p.open(mode='r') as json_file:
+            data = json.load(json_file)
+    if type(data) == list:
+        return data
+    return data['abi']

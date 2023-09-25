@@ -1,4 +1,3 @@
-import private_key as pk
 import help_info as hi
 
 use_cnt = {}
@@ -27,26 +26,33 @@ def exit():
     info += op_info
     return info
 
-from operate import op_account as op_acc, op_plus
+from operate import op_account as op_acc, op_contract,op_plus, op_test
 ### 各类基础操作 通过传递的参数区分
 ## 数字指令为基础操作
-def base_operate(cmd, account, *params) -> bool:
+def base_operate(cmd, account, *params, **key) -> bool:
     if not cmd:
         return
     print(f'recive cmd: {cmd}')
     if cmd == '-1' :
-        return op_acc.check_balance(account)
+        address = key.get('address')
+        if address is None:
+            address = account.address
+        return op_acc.check_balance(address, key.get('chain'))
     elif cmd == '-2':
         target_addr, amount = params[0], params[1]
         return op_acc.transfer_eth(account, target_addr, amount)
     elif cmd == '-3':
         amount = params[0]
-        rs = op_acc.deposit(amount)
+        rs = op_acc.deposit(account, amount)
         print(rs)
         return rs
     elif cmd == '-4':
         amount = params[0]
-        rs = op_acc.withdraw(amount)
+        rs = op_acc.withdraw(account, amount)
+        print(rs)
+        return rs
+    elif cmd == '-5':
+        rs = op_contract.deploy(account, key.get('path'))
         print(rs)
         return rs
     elif cmd == '0':
@@ -63,6 +69,9 @@ def senior_operate(cmd, *params) -> bool:
         return op_plus.batch(params[0], params[1])
     elif cmd == '-random':
         return op_plus.op_random(params[0], params[1])
+    elif cmd == 'test':
+        ## test code
+        return op_test.do_test()
     else:
         pass
 
@@ -70,10 +79,11 @@ def senior_operate(cmd, *params) -> bool:
 class Op_cmd():
     _args = ()
 
-    def __init__(self, *params) -> None:
-        self._cmd = params[0]
-        if len(params) > 1 :
-            self._args = params[1:]
+    def __init__(self, account, cmd, *args, **keys) -> None:
+        self._cmd = cmd
+        self._args = args
+        self._keys = keys
+        self._account = account
     
     @property
     def cmd(self):
@@ -81,17 +91,20 @@ class Op_cmd():
     @property
     def args(self) -> tuple:
         return self._args
+    
+    def execute(self):
+        return base_operate(self._cmd, self._account, *self.args, **self._keys)
 
 ## 根据指令构造指令对象
-def cmd_instance(cmd, **key) -> Op_cmd:
+def cmd_instance(cmd, account, **key) -> Op_cmd:
     args = (cmd,)
     if cmd == '-1':
         pass
     elif cmd == '-2':
-        args = (cmd, key.get('target_addr'), key.get('amount'))
+        args = (key.get('target_addr'), key.get('amount'))
     elif cmd == '-3':
-        args = (cmd, key.get('amount'))
+        args = (key.get('amount'),)
     elif cmd == '-4':
-        args = (cmd, key.get('amount'))
+        args = (key.get('amount'),)
     
-    return Op_cmd(*args)
+    return Op_cmd(account, cmd, *args, **key)
